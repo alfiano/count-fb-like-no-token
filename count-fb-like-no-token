@@ -1,0 +1,29 @@
+function get_facebook_count($page_id){
+    $params = array(
+        'sslverify' => false,
+        'timeout'   => 100
+    );
+
+    $response = wp_remote_get( 'https://www.facebook.com/' . $page_id );
+
+    if ( is_wp_error( $response ) || empty( $response['response']['code'] ) || '200' != $response['response']['code'] ) {
+        $response = wp_remote_get( 'https://www.facebook.com/' . $page_id, $params );
+    }
+
+    if ( ! is_wp_error( $response ) && ! empty( $response['response']['code'] ) && '200' == $response['response']['code'] ) {
+        $pattern = "/<div class=\"_4bl9\"><div>(.*?)<\/div><\/div>/";
+        preg_match_all($pattern, $response['body'], $matches);
+        
+         if ( !empty($matches[1][1]) )
+            {
+              $result = '';
+              foreach (str_split($matches[1][0]) as $char) {
+                if (is_numeric($char))
+                  {
+                    $result .= $char;
+                  }
+                }
+               return (int) $result;
+             }
+    };
+}
